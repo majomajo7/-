@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="오디오를 같은 길이의 GPT 전사용 MP3 파일로 나누는 웹 도구" />
+  <title>GPT Audio Splitter</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero">
+      <div class="eyebrow">AUDIO UTILITY</div>
+      <h1>GPT Audio Splitter</h1>
+      <p class="hero-copy">오디오 파일과 분할 개수만 선택하세요. 같은 길이의 GPT 전사용 MP3로 변환해 ZIP 파일로 묶어드립니다.</p>
+    </section>
+
+    <section class="app-card" aria-label="오디오 분할 도구">
+      <form id="splitForm">
+        <div id="dropZone" class="drop-zone" tabindex="0" role="button" aria-label="오디오 파일 선택">
+          <input id="audioFile" name="audio" type="file" accept="audio/*,.mp4,.mov" hidden required />
+          <div class="upload-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14.5v3A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div id="dropTitle" class="drop-title">오디오 파일을 여기에 놓으세요</div>
+          <div class="drop-subtitle">또는 클릭하여 파일 선택 · 최대 {{MAX_UPLOAD_MB}}MB</div>
+          <div class="format-list">MP3 · M4A · WAV · WEBM · OGG · OPUS · AAC · FLAC · MP4</div>
+        </div>
+
+        <div id="fileCard" class="file-card hidden" aria-live="polite">
+          <div class="file-mark">♪</div>
+          <div class="file-details">
+            <strong id="fileName"></strong>
+            <span id="fileMeta"></span>
+          </div>
+          <button id="removeFile" class="icon-button" type="button" aria-label="선택 파일 삭제">×</button>
+        </div>
+
+        <div class="controls-grid">
+          <label class="field">
+            <span class="field-label">분할 개수</span>
+            <span class="number-control">
+              <button id="minusButton" type="button" aria-label="분할 개수 줄이기">−</button>
+              <input id="splitCount" name="split_count" type="number" min="2" max="{{MAX_SPLITS}}" value="4" required />
+              <button id="plusButton" type="button" aria-label="분할 개수 늘리기">＋</button>
+            </span>
+            <span class="field-help">2~{{MAX_SPLITS}}개 사이에서 입력</span>
+          </label>
+
+          <div class="estimate-card">
+            <span class="field-label">예상 결과</span>
+            <strong id="partDuration">파일을 선택하면 계산됩니다</strong>
+            <span id="partSize" class="field-help">GPT 업로드용 48 kbps MP3</span>
+          </div>
+        </div>
+
+        <label id="keyField" class="field key-field hidden">
+          <span class="field-label">접속 암호</span>
+          <input id="accessKey" name="access_key" type="password" autocomplete="current-password" placeholder="관리자가 설정한 암호" />
+        </label>
+
+        <div class="quality-row">
+          <div><span class="quality-dot"></span><strong>음성 인식 최적화</strong></div>
+          <span>MP3 · 모노 · 16 kHz · 48 kbps</span>
+        </div>
+
+        <button id="submitButton" class="primary-button" type="submit" disabled>
+          <span class="button-label">동일 길이로 분할하기</span>
+          <span class="button-arrow">→</span>
+        </button>
+      </form>
+
+      <div id="progressPanel" class="progress-panel hidden" aria-live="polite">
+        <div class="progress-header">
+          <strong id="progressTitle">파일 업로드 중</strong>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+        <p id="progressMessage">파일 크기에 따라 잠시 시간이 걸릴 수 있습니다.</p>
+      </div>
+
+      <div id="resultPanel" class="result-panel hidden" aria-live="polite">
+        <div class="result-icon">✓</div>
+        <div>
+          <strong>분할이 완료되었습니다.</strong>
+          <p id="resultMessage">ZIP 파일 다운로드가 시작되었습니다.</p>
+        </div>
+      </div>
+
+      <div id="errorPanel" class="error-panel hidden" role="alert"></div>
+    </section>
+
+    <section class="steps" aria-label="사용 방법">
+      <article><span>01</span><h2>파일 선택</h2><p>회의 녹음이나 음성 파일을 업로드합니다.</p></article>
+      <article><span>02</span><h2>개수 입력</h2><p>2, 3, 4처럼 원하는 파일 개수만 입력합니다.</p></article>
+      <article><span>03</span><h2>GPT에 업로드</h2><p>ZIP을 풀고 MP3를 순서대로 GPT에 넣습니다.</p></article>
+    </section>
+
+    <footer>
+      <p>업로드 파일은 처리 후 서버에서 자동 삭제됩니다. 장기 보관하지 않습니다.</p>
+    </footer>
+  </main>
+
+  <script>
+    window.APP_CONFIG = {
+      maxSplits: {{MAX_SPLITS}},
+      requiresKey: {{REQUIRES_KEY}}
+    };
+  </script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: gpt-audio-splitter
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: MAX_UPLOAD_MB
+        value: "500"
+      - key: MAX_SPLITS
+        value: "30"
+      - key: ACCESS_KEY
+        sync: false
